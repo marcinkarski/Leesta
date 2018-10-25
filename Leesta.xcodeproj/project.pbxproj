@@ -8,11 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		2E1E705E2181BFF6005470B6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E1E705D2181BFF6005470B6 /* AppDelegate.swift */; };
-		2E1E70602181BFF6005470B6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E1E705F2181BFF6005470B6 /* ViewController.swift */; };
 		2E1E70652181BFF7005470B6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2E1E70642181BFF7005470B6 /* Assets.xcassets */; };
 		2E1E70682181BFF7005470B6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E1E70662181BFF7005470B6 /* LaunchScreen.storyboard */; };
 		2E1E70702181C0D6005470B6 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E1E706F2181C0D6005470B6 /* TableViewController.swift */; };
 		2E1E70752181C615005470B6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2E1E70742181C615005470B6 /* GoogleService-Info.plist */; };
+		2EA8F1782181EEF100CA2F09 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EA8F1762181EEF000CA2F09 /* Item.swift */; };
+		2EA8F1792181EEF100CA2F09 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EA8F1772181EEF000CA2F09 /* User.swift */; };
+		2EA8F17B2181EFFE00CA2F09 /* ListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EA8F17A2181EFFE00CA2F09 /* ListTableViewController.swift */; };
 		D1BA865860353A74CDDE41DD /* Pods_Leesta.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6ED2387027C6026B984D166E /* Pods_Leesta.framework */; };
 /* End PBXBuildFile section */
 
@@ -20,12 +22,14 @@
 		0992F0D414092B0B737A64E6 /* Pods-Leesta.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Leesta.release.xcconfig"; path = "Pods/Target Support Files/Pods-Leesta/Pods-Leesta.release.xcconfig"; sourceTree = "<group>"; };
 		2E1E705A2181BFF6005470B6 /* Leesta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Leesta.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E1E705D2181BFF6005470B6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		2E1E705F2181BFF6005470B6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		2E1E70642181BFF7005470B6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2E1E70672181BFF7005470B6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2E1E70692181BFF7005470B6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2E1E706F2181C0D6005470B6 /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		2E1E70742181C615005470B6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		2EA8F1762181EEF000CA2F09 /* Item.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		2EA8F1772181EEF000CA2F09 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		2EA8F17A2181EFFE00CA2F09 /* ListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListTableViewController.swift; sourceTree = "<group>"; };
 		6ED2387027C6026B984D166E /* Pods_Leesta.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Leesta.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8982C02E3D873A0051A8C1A1 /* Pods-Leesta.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Leesta.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Leesta/Pods-Leesta.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -75,7 +79,7 @@
 		2E1E70712181C263005470B6 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				2E1E705F2181BFF6005470B6 /* ViewController.swift */,
+				2EA8F17A2181EFFE00CA2F09 /* ListTableViewController.swift */,
 				2E1E706F2181C0D6005470B6 /* TableViewController.swift */,
 			);
 			path = Controllers;
@@ -91,6 +95,8 @@
 		2E1E70732181C455005470B6 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				2EA8F1762181EEF000CA2F09 /* Item.swift */,
+				2EA8F1772181EEF000CA2F09 /* User.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -249,8 +255,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2E1E70602181BFF6005470B6 /* ViewController.swift in Sources */,
+				2EA8F17B2181EFFE00CA2F09 /* ListTableViewController.swift in Sources */,
 				2E1E70702181C0D6005470B6 /* TableViewController.swift in Sources */,
+				2EA8F1782181EEF100CA2F09 /* Item.swift in Sources */,
+				2EA8F1792181EEF100CA2F09 /* User.swift in Sources */,
 				2E1E705E2181BFF6005470B6 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

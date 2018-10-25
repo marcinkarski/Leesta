@@ -1,6 +1,6 @@
 import UIKit
 
-class TableViewController: UIViewController {
+final class TableViewController: UIViewController {
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: view.bounds, style: .plain)
