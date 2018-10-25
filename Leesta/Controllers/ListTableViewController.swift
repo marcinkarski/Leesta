@@ -4,87 +4,61 @@ import Firebase
 class ListTableViewController: UIViewController {
     
     private lazy var tableView: UITableView = {
-        let tableView = UITableView(frame: view.bounds, style: .plain)
+        let tableView = UITableView(frame: view.bounds, style: .grouped)
         tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "ItemCell")
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        tableView.separatorInset = .zero
         tableView.dataSource = self
+        tableView.delegate = self
         return tableView
     }()
     
-    // MARK: Constants
-    let listToUsers = "ListToUsers"
-    
-    // MARK: Properties
-    
-    
     var items: [Item] = []
     var user: User!
-//    var userCountBarButtonItem: UIBarButtonItem!
     let ref = Database.database().reference(withPath: "list-items")
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
     
-    // MARK: UIViewController Lifecycle
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.addSubview(tableView)
+        setupNavigationBar()
         
-//        tableView.allowsMultipleSelectionDuringEditing = false
-        
-//        userCountBarButtonItem = UIBarButtonItem(title: "1",
-//                                                 style: .plain,
-//                                                 target: self,
-//                                                 action: #selector(userCountButtonDidTouch))
-//        userCountBarButtonItem.tintColor = UIColor.white
-//        navigationItem.leftBarButtonItem = userCountBarButtonItem
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonDidTouch))
         
-        user = User(uid: "FakeId", email: "dummy@gmail.com")
-       
-        ref.observe(.value, with: { snapshot in
+        ref.queryOrdered(byChild: "completed").observe(.value, with: { snapshot in
             var newItems: [Item] = []
             for child in snapshot.children {
                 if let snapshot = child as? DataSnapshot,
-                    let listItem = Item(snapshot: snapshot) {
-                    newItems.append(listItem)
+                    let groceryItem = Item(snapshot: snapshot) {
+                    newItems.append(groceryItem)
                 }
             }
             self.items = newItems
             self.tableView.reloadData()
         })
     }
-    
-    // MARK: Add Item
-    
-    @objc func addButtonDidTouch(_ sender: AnyObject) {
-        let alert = UIAlertController(title: "Leesta Item",
-                                      message: "Add an Item",
-                                      preferredStyle: .alert)
 
+    @objc func addButtonDidTouch(_ sender: AnyObject) {
+        let alert = UIAlertController(title: "Add an item to your Leesta",
+                                      message: nil,
+                                      preferredStyle: .alert)
+        
         let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
             guard let textField = alert.textFields?.first, let text = textField.text else { return }
             let listItem = Item(name: text, addedByUser: self.user.email, completed: false)
             let listItemRef = self.ref.child(text.lowercased())
             listItemRef.setValue(listItem.toAnyObject())
         }
-
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-
         alert.addTextField()
-
         alert.addAction(saveAction)
         alert.addAction(cancelAction)
-
         present(alert, animated: true, completion: nil)
     }
-    
-//    @objc func userCountButtonDidTouch() {
-//        performSegue(withIdentifier: listToUsers, sender: nil)
-//    }
 }
 
 extension ListTableViewController: UITableViewDataSource {
@@ -94,11 +68,11 @@ extension ListTableViewController: UITableViewDataSource {
         }
     
         func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "ItemCell", for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
             let listItem = items[indexPath.row]
-            print(items)
             cell.textLabel?.text = listItem.name
-//            cell.detailTextLabel?.text = listItem.addedByUser
+            cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 28)
+            cell.textLabel?.numberOfLines = 0
             toggleCellCheckbox(cell, isCompleted: listItem.completed)
             return cell
         }
@@ -116,7 +90,7 @@ extension ListTableViewController: UITableViewDataSource {
     }
 }
 
-extension ListTableViewController: UITabBarDelegate {
+extension ListTableViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
@@ -124,18 +98,27 @@ extension ListTableViewController: UITabBarDelegate {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            items.remove(at: indexPath.row)
-            tableView.reloadData()
+            let listItem = items[indexPath.row]
+            listItem.ref?.removeValue()
         }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let cell = tableView.cellForRow(at: indexPath) else { return }
-        var listItem = items[indexPath.row]
+        let listItem = items[indexPath.row]
         let toggledCompletion = !listItem.completed
-        
         toggleCellCheckbox(cell, isCompleted: toggledCompletion)
-        listItem.completed = toggledCompletion
-        tableView.reloadData()
+        listItem.ref?.updateChildValues(["completed": toggledCompletion])
+    }
+}
+
+extension ListTableViewController {
+    
+    private func setupNavigationBar() {
+        self.title = "Leesta"
+        navigationController?.navigationBar.isTranslucent = false
+        navigationController?.navigationBar.barTintColor = .orange
+        navigationController?.navigationBar.tintColor = .white
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.white]
     }
 }
