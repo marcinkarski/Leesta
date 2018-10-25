@@ -3,23 +3,24 @@ import Firebase
 
 class ListTableViewController: UIViewController {
     
+    var items: [Item] = []
+    var user: User!
+    let ref = Database.database().reference(withPath: "list-items")
+    
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: view.bounds, style: .grouped)
         tableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        tableView.backgroundColor = .white
         tableView.separatorInset = .zero
         tableView.dataSource = self
         tableView.delegate = self
         return tableView
     }()
     
-    var items: [Item] = []
-    var user: User!
-    let ref = Database.database().reference(withPath: "list-items")
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-    }
+//    override var preferredStatusBarStyle: UIStatusBarStyle {
+//        return .lightContent
+//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,7 +50,7 @@ class ListTableViewController: UIViewController {
         
         let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
             guard let textField = alert.textFields?.first, let text = textField.text else { return }
-            let listItem = Item(name: text, addedByUser: self.user.email, completed: false)
+            let listItem = Item(name: text, completed: false)
             let listItemRef = self.ref.child(text.lowercased())
             listItemRef.setValue(listItem.toAnyObject())
         }
@@ -73,6 +74,7 @@ extension ListTableViewController: UITableViewDataSource {
             cell.textLabel?.text = listItem.name
             cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 28)
             cell.textLabel?.numberOfLines = 0
+            cell.backgroundColor = .white
             toggleCellCheckbox(cell, isCompleted: listItem.completed)
             return cell
         }
@@ -80,12 +82,12 @@ extension ListTableViewController: UITableViewDataSource {
     func toggleCellCheckbox(_ cell: UITableViewCell, isCompleted: Bool) {
         if !isCompleted {
             cell.accessoryType = .none
-            cell.textLabel?.textColor = .black
-            cell.detailTextLabel?.textColor = .black
+            cell.textLabel?.textColor = .orange
         } else {
             cell.accessoryType = .checkmark
-            cell.textLabel?.textColor = .gray
-            cell.detailTextLabel?.textColor = .gray
+            cell.tintColor = .lightGray
+            cell.textLabel?.textColor = .lightGray
+            cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         }
     }
 }
@@ -117,8 +119,10 @@ extension ListTableViewController {
     private func setupNavigationBar() {
         self.title = "Leesta"
         navigationController?.navigationBar.isTranslucent = false
-        navigationController?.navigationBar.barTintColor = .orange
-        navigationController?.navigationBar.tintColor = .white
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.white]
+        navigationController?.navigationBar.barTintColor = .white
+        navigationController?.navigationBar.tintColor = .orange
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.orange]
     }
 }

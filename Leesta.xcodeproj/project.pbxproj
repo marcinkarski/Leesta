@@ -10,7 +10,6 @@
 		2E1E705E2181BFF6005470B6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E1E705D2181BFF6005470B6 /* AppDelegate.swift */; };
 		2E1E70652181BFF7005470B6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2E1E70642181BFF7005470B6 /* Assets.xcassets */; };
 		2E1E70682181BFF7005470B6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2E1E70662181BFF7005470B6 /* LaunchScreen.storyboard */; };
-		2E1E70702181C0D6005470B6 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E1E706F2181C0D6005470B6 /* TableViewController.swift */; };
 		2E1E70752181C615005470B6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2E1E70742181C615005470B6 /* GoogleService-Info.plist */; };
 		2EA8F1782181EEF100CA2F09 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EA8F1762181EEF000CA2F09 /* Item.swift */; };
 		2EA8F1792181EEF100CA2F09 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EA8F1772181EEF000CA2F09 /* User.swift */; };
@@ -26,7 +25,6 @@
 		2E1E70642181BFF7005470B6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2E1E70672181BFF7005470B6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2E1E70692181BFF7005470B6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		2E1E706F2181C0D6005470B6 /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		2E1E70742181C615005470B6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		2EA8F1762181EEF000CA2F09 /* Item.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		2EA8F1772181EEF000CA2F09 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -82,7 +80,6 @@
 			isa = PBXGroup;
 			children = (
 				2EA8F17A2181EFFE00CA2F09 /* ListTableViewController.swift */,
-				2E1E706F2181C0D6005470B6 /* TableViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -259,7 +256,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2EA8F17B2181EFFE00CA2F09 /* ListTableViewController.swift in Sources */,
-				2E1E70702181C0D6005470B6 /* TableViewController.swift in Sources */,
 				2EA8F17D21821F4100CA2F09 /* ItemCell.swift in Sources */,
 				2EA8F1782181EEF100CA2F09 /* Item.swift in Sources */,
 				2EA8F1792181EEF100CA2F09 /* User.swift in Sources */,
@@ -412,7 +408,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = axaneo.Leesta;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -431,7 +427,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = axaneo.Leesta;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
