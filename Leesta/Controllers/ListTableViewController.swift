@@ -17,11 +17,7 @@ class ListTableViewController: UIViewController {
         tableView.delegate = self
         return tableView
     }()
-    
-//    override var preferredStatusBarStyle: UIStatusBarStyle {
-//        return .lightContent
-//    }
-    
+   
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -29,6 +25,8 @@ class ListTableViewController: UIViewController {
         setupNavigationBar()
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonDidTouch))
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Reorder", style: .plain, target: self, action: #selector(reorderButtonDidTouch))
         
         ref.queryOrdered(byChild: "completed").observe(.value, with: { snapshot in
             var newItems: [Item] = []
@@ -42,12 +40,19 @@ class ListTableViewController: UIViewController {
             self.tableView.reloadData()
         })
     }
+    
+    @objc func reorderButtonDidTouch(_ sender: AnyObject) {
+        tableView.isEditing = !tableView.isEditing
+//        switch tableView.isEditing {
+//        case true:
+//            editButton.title = "Reorder"
+//        case false:
+//            editButton.title = "Done"
+//        }
+    }
 
     @objc func addButtonDidTouch(_ sender: AnyObject) {
-        let alert = UIAlertController(title: "Add an item to your Leesta",
-                                      message: nil,
-                                      preferredStyle: .alert)
-        
+        let alert = UIAlertController(title: "Add an item to your Leesta", message: nil, preferredStyle: .alert)
         let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
             guard let textField = alert.textFields?.first, let text = textField.text else { return }
             let listItem = Item(name: text, completed: false)
@@ -89,6 +94,24 @@ extension ListTableViewController: UITableViewDataSource {
             cell.textLabel?.textColor = .lightGray
             cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         }
+    }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .none
+    }
+
+    func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+        return false
+    }
+    
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let movedObject = self.items[sourceIndexPath.row]
+        items.remove(at: sourceIndexPath.row)
+        items.insert(movedObject, at: destinationIndexPath.row)
     }
 }
 
