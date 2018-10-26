@@ -1,11 +1,23 @@
 import UIKit
 import Firebase
 
+enum State {
+    case expanded, minimized
+}
+
 class ListTableViewController: UIViewController {
     
     var items: [Item] = []
-    var user: User!
     let ref = Database.database().reference(withPath: "list-items")
+    
+    var runningAnimators = [Int: UIViewPropertyAnimator]()
+    var progressWhenInterrupted: CGFloat = 0
+    var viewState: State = .minimized
+    
+    lazy var width: CGFloat = { return self.view.frame.width}()
+    lazy var topFrame: CGRect = { return CGRect(x: 0, y: 200, width: self.width, height: self.view.frame.height) }()
+    lazy var bottomFrame: CGRect = { return CGRect(x: 0, y: self.view.frame.height - 50, width: self.width, height: self.view.frame.height) }()
+    lazy var totalVerticalDistance: CGFloat = { self.bottomFrame.minY - self.topFrame.minY }()
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: view.bounds, style: .grouped)
@@ -17,12 +29,54 @@ class ListTableViewController: UIViewController {
         tableView.delegate = self
         return tableView
     }()
+    
+    private lazy var textView: UITextView = {
+        let textView = UITextView()
+        textView.translatesAutoresizingMaskIntoConstraints = false
+//        textView.text = "Type in an item here"
+        textView.delegate = self
+        textView.font = UIFont.boldSystemFont(ofSize: 28)
+        textView.textColor = .white
+        textView.textAlignment = .center
+        textView.backgroundColor = .clear
+        return textView
+    }()
+    
+    private lazy var saveButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Save", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(saveButtonDidTouch), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var bottomView: UIView = {
+        let view = UIView(frame: .zero)
+        view.backgroundColor = .orange
+        view.layer.cornerRadius = 8
+        return view
+    }()
    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.addSubview(tableView)
         setupNavigationBar()
+        
+        bottomView.frame = bottomFrame
+        view.addSubview(bottomView)
+        bottomView.addSubview(textView)
+        bottomView.addSubview(saveButton)
+        textView.leadingAnchor.constraint(equalTo: bottomView.leadingAnchor, constant: 10).isActive = true
+        textView.topAnchor.constraint(equalTo: bottomView.topAnchor, constant: 50).isActive = true
+        textView.trailingAnchor.constraint(equalTo: bottomView.trailingAnchor, constant: -10).isActive = true
+        textView.bottomAnchor.constraint(equalTo: bottomView.bottomAnchor, constant: -200).isActive = true
+        saveButton.topAnchor.constraint(equalTo: bottomView.topAnchor, constant: 20).isActive = true
+        saveButton.centerXAnchor.constraint(equalTo: bottomView.centerXAnchor).isActive = true
+        
+        bottomView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(bottomViewTapped)))
+        bottomView.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(bottomViewPanned)))
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonDidTouch))
         
@@ -40,6 +94,10 @@ class ListTableViewController: UIViewController {
             self.items = newItems
             self.tableView.reloadData()
         })
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
     }
     
     @objc func longPressGestureRecognized(_ gestureRecognizer: UIGestureRecognizer) {
@@ -137,6 +195,14 @@ class ListTableViewController: UIViewController {
     }
 
     @objc func addButtonDidTouch(_ sender: AnyObject) {
+        
+        self.textView.becomeFirstResponder()
+        
+        if runningAnimators.isEmpty {
+            animateTransitionIfNeeded(state: viewState, duration: 0.5)
+        } else {
+            runningAnimators.forEach { $1.isReversed = !$1.isReversed }
+        }
         let alert = UIAlertController(title: "Add an item to your Leesta", message: nil, preferredStyle: .alert)
         let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
             guard let textField = alert.textFields?.first, let text = textField.text else { return }
@@ -144,11 +210,103 @@ class ListTableViewController: UIViewController {
             let listItemRef = self.ref.child(text.lowercased())
             listItemRef.setValue(listItem.toAnyObject())
         }
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-        alert.addTextField()
-        alert.addAction(saveAction)
-        alert.addAction(cancelAction)
-        present(alert, animated: true, completion: nil)
+//        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+//        alert.addTextField()
+//        alert.addAction(saveAction)
+//        alert.addAction(cancelAction)
+//        present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func saveButtonDidTouch(_ sender: AnyObject) {
+        guard let text = textView.text else { return }
+        let listItem = Item(name: text, completed: false)
+        let listItemRef = self.ref.child(text.lowercased())
+        listItemRef.setValue(listItem.toAnyObject())
+        textView.text = ""
+        
+        self.view.endEditing(true)
+        if runningAnimators.isEmpty {
+            animateTransitionIfNeeded(state: viewState, duration: 0.5)
+        } else {
+            runningAnimators.forEach { $1.isReversed = !$1.isReversed }
+        }
+    }
+    
+    func animateTransitionIfNeeded(state: State, duration: TimeInterval) {
+        if runningAnimators.isEmpty {
+            let frameAnimator = UIViewPropertyAnimator(duration: duration, dampingRatio: 1) {
+                switch state {
+                case .minimized:
+                    self.bottomView.frame = self.topFrame
+                case .expanded:
+                    self.bottomView.frame = self.bottomFrame
+                }
+            }
+            
+            let identifier = frameAnimator.hash
+            frameAnimator.addCompletion { position in
+                self.cleanup(animatorWithId: identifier, at: position)
+            }
+            
+            frameAnimator.startAnimation()
+            runningAnimators[identifier] = frameAnimator
+        }
+    }
+    
+    @objc func bottomViewPanned(gesture: UIPanGestureRecognizer) {
+        let translation = gesture.translation(in: bottomView)
+        let verticalTranslation = viewState == .minimized ? -translation.y : translation.y
+        let fraction = (verticalTranslation / totalVerticalDistance) + progressWhenInterrupted
+        
+        switch gesture.state {
+        case .began:
+            animateTransitionIfNeeded(state: viewState, duration: 0.5)
+            
+            runningAnimators.forEach { $1.pauseAnimation() }
+            progressWhenInterrupted = runningAnimators.first?.value.fractionComplete ?? 0
+        case .changed:
+            self.view.endEditing(true)
+            runningAnimators.forEach { $1.fractionComplete = fraction }
+        case .ended:
+            let velocity = gesture.velocity(in: bottomView)
+            
+            switch viewState {
+            case .minimized:
+                if velocity.y > -500 && fraction < 0.5 {
+                    runningAnimators.forEach { $1.isReversed = !$1.isReversed }
+                }
+            case .expanded:
+                if velocity.y < 500 && fraction < 0.5 {
+                    runningAnimators.forEach { $1.isReversed = !$1.isReversed }
+                }
+            }
+            
+            runningAnimators.forEach { $1.continueAnimation(withTimingParameters: nil, durationFactor: 1) }
+        default:
+            break
+        }
+    }
+    
+    @objc func bottomViewTapped(gesture: UITapGestureRecognizer) {
+        if runningAnimators.isEmpty {
+            animateTransitionIfNeeded(state: viewState, duration: 0.5)
+        } else {
+            runningAnimators.forEach { $1.isReversed = !$1.isReversed }
+        }
+    }
+    
+    func cleanup(animatorWithId identifier: Int, at position: UIViewAnimatingPosition) {
+        if position == .end {
+            switch self.bottomView.frame {
+            case self.bottomFrame:
+                self.viewState = .minimized
+            case self.topFrame:
+                self.viewState = .expanded
+            default:
+                break
+            }
+        }
+        self.runningAnimators.removeValue(forKey: identifier)
     }
 }
 
@@ -215,5 +373,22 @@ extension ListTableViewController {
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.orange]
+    }
+}
+
+extension ListTableViewController: UITextViewDelegate {
+
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.textColor == .lightGray {
+            textView.text = ""
+            textView.textColor = .white
+        }
+    }
+
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if textView.text.isEmpty {
+            textView.text = "Type in an item here"
+            textView.textColor = .white
+        }
     }
 }
