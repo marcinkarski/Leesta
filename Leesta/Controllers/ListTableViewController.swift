@@ -320,10 +320,27 @@ extension ListTableViewController: UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
             let listItem = items[indexPath.row]
             cell.textLabel?.text = listItem.name
-            cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 28)
+            cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 22)
             cell.textLabel?.numberOfLines = 0
-            cell.backgroundColor = .white
-            toggleCellCheckbox(cell, isCompleted: listItem.completed)
+            cell.textLabel?.textColor = .orange
+            cell.accessoryType = .none
+//            toggleCellCheckbox(cell, isCompleted: listItem.completed)
+            
+            if listItem.completed {
+                cell.accessoryType = .none
+                cell.textLabel?.textColor = .lightGray
+                cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 22)
+                let attributes = [NSAttributedString.Key.strikethroughStyle: 2]
+                let title = NSAttributedString(string: listItem.name, attributes: attributes)
+                cell.textLabel?.attributedText = title
+            } else {
+                cell.accessoryType = .none
+                cell.textLabel?.textColor = .orange
+                cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 22)
+                let attributes = [NSAttributedString.Key.strikethroughStyle: 0]
+                let title = NSAttributedString(string: listItem.name, attributes: attributes)
+                cell.textLabel?.attributedText = title
+            }
             return cell
         }
     
@@ -335,7 +352,6 @@ extension ListTableViewController: UITableViewDataSource {
             cell.accessoryType = .checkmark
             cell.tintColor = .lightGray
             cell.textLabel?.textColor = .lightGray
-            cell.textLabel?.font = UIFont.boldSystemFont(ofSize: 18)
         }
     }
 }
@@ -354,10 +370,10 @@ extension ListTableViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let cell = tableView.cellForRow(at: indexPath) else { return }
+//        guard let cell = tableView.cellForRow(at: indexPath) else { return }
         let listItem = items[indexPath.row]
         let toggledCompletion = !listItem.completed
-        toggleCellCheckbox(cell, isCompleted: toggledCompletion)
+//        toggleCellCheckbox(cell, isCompleted: toggledCompletion)
         listItem.ref?.updateChildValues(["completed": toggledCompletion])
         tableView.deselectRow(at: indexPath, animated: false)
     }
